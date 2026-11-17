@@ -1,0 +1,85 @@
+
+@startuml
+title UML-диаграмма компонентов Business Metrics Analyzer
+
+skinparam componentStyle uml2
+skinparam shadowing false
+left to right direction
+
+package "Presentation (API)" {
+  component "AuthController" as AuthController
+  component "SalesController" as SalesController
+  component "KpiController" as KpiController
+  component "ReportsController" as ReportsController
+}
+
+package "Application (Service Layer)" {
+  component "AuthService" as AuthService
+  component "SalesImportService" as SalesImportService
+  component "KpiService" as KpiService
+  component "ReportService" as ReportService
+  component "UserService" as UserService
+}
+
+package "Domain" {
+  component "Sale" as Sale
+  component "Kpi" as Kpi
+  component "User" as User
+  component "Report" as Report
+  component "KpiStrategy" as KpiStrategy
+  component "Validators" as Validators
+}
+
+package "Infrastructure" {
+  component "SqlSaleRepository" as SqlSaleRepository
+  component "SqlUserRepository" as SqlUserRepository
+  component "UnitOfWork" as UnitOfWork
+  component "JwtProvider" as JwtProvider
+  component "ExcelReportGenerator" as ExcelReportGenerator
+  component "EmailNotifier" as EmailNotifier
+}
+
+interface "IAuthService" as IAuthService
+interface "ISalesImportService" as ISalesImportService
+interface "IKpiService" as IKpiService
+interface "IReportService" as IReportService
+interface "ISaleRepository" as ISaleRepository
+
+database "PostgreSQL" as DB
+cloud "SMTP" as SMTP
+
+AuthController ..> IAuthService
+SalesController ..> ISalesImportService
+KpiController ..> IKpiService
+ReportsController ..> IReportService
+
+AuthService ..|> IAuthService
+SalesImportService ..|> ISalesImportService
+KpiService ..|> IKpiService
+ReportService ..|> IReportService
+
+AuthService ..> JwtProvider
+AuthService ..> UserService
+UserService ..> SqlUserRepository
+UserService ..> User
+
+SalesImportService ..> UnitOfWork
+SalesImportService ..> ISaleRepository
+SalesImportService ..> Validators
+SalesImportService ..> Sale
+
+KpiService ..> KpiStrategy
+KpiService ..> ISaleRepository
+KpiService ..> Kpi
+
+ReportService ..> ExcelReportGenerator
+ReportService ..> EmailNotifier
+ReportService ..> Report
+
+SqlSaleRepository ..|> ISaleRepository
+SqlSaleRepository ..> DB
+SqlUserRepository ..> DB
+UnitOfWork ..> DB
+EmailNotifier ..> SMTP
+
+@enduml
